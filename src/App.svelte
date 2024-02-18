@@ -1,23 +1,25 @@
 <script lang="ts">
-  import { Select } from 'flowbite-svelte';
+  import { Select } from "flowbite-svelte";
 
-
-  import { onMount } from 'svelte';
+  import { onMount } from "svelte";
 
   let isRecording = false;
   let availableMicrophones = [];
-  let selectedMicrophoneId = '';
+  let selectedMicrophoneId = "";
   let screenStream;
   let screenRecorder;
   let webcamStream;
   let screenVideoUrl;
 
-
   onMount(async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
     availableMicrophones = devices
-      .filter(device => device.kind === 'audioinput')
-      .map(device => ({ inputDeviceInfo: device, value: device.deviceId, name: device.label || 'Microphone ' + device.deviceId }))
+      .filter((device) => device.kind === "audioinput")
+      .map((device) => ({
+        inputDeviceInfo: device,
+        value: device.deviceId,
+        name: device.label || "Microphone " + device.deviceId,
+      }));
 
     if (availableMicrophones.length > 0) {
       selectedMicrophoneId = availableMicrophones[0].value;
@@ -25,68 +27,84 @@
   });
 
   async function startRecording() {
-    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
-    const audioConstraints = { audio: { deviceId: selectedMicrophoneId ? { exact: selectedMicrophoneId } : undefined } };
-    const audioStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+    screenStream = await navigator.mediaDevices.getDisplayMedia({
+      video: true,
+      audio: false,
+    });
+    const audioConstraints = {
+      audio: {
+        deviceId: selectedMicrophoneId
+          ? { exact: selectedMicrophoneId }
+          : undefined,
+      },
+    };
+    const audioStream =
+      await navigator.mediaDevices.getUserMedia(audioConstraints);
     webcamStream = new MediaStream([...audioStream.getTracks()]);
-    const combinedStream = new MediaStream([...screenStream.getVideoTracks(), ...webcamStream.getAudioTracks()], {
-      mimeType: 'video/webm; codecs=vp9', // VP9 codec for better 
-      videoBitsPerSecond: 2 * 1024 * 1024 // 2 Mbps bitrate
+    const combinedStream = new MediaStream(
+      [...screenStream.getVideoTracks(), ...webcamStream.getAudioTracks()],
+      {
+        mimeType: "video/webm; codecs=vp9", // VP9 codec for better
+        videoBitsPerSecond: 2 * 1024 * 1024, // 2 Mbps bitrate
+      },
+    );
+
+    screenRecorder = new MediaRecorder(combinedStream, {
+      mimeType: "video/webm",
     });
 
-    screenRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
-
     const screenChunks = [];
-    screenRecorder.ondataavailable = e => screenChunks.push(e.data);
+    screenRecorder.ondataavailable = (e) => screenChunks.push(e.data);
     screenRecorder.onstop = () => {
-      const blob = new Blob(screenChunks, { type: 'video/webm' });
+      const blob = new Blob(screenChunks, { type: "video/webm" });
       screenVideoUrl = URL.createObjectURL(blob);
     };
     screenRecorder.start();
 
-
-  // Now add the webcam stream for PiP without recording it
+    // Now add the webcam stream for PiP without recording it
     const webcamConstraints = { video: true };
-    navigator.mediaDevices.getUserMedia(webcamConstraints)
-      .then(stream => {
+    navigator.mediaDevices
+      .getUserMedia(webcamConstraints)
+      .then((stream) => {
         webcamStream = stream;
-        const videoElement = document.createElement('video');
+        const videoElement = document.createElement("video");
         videoElement.srcObject = webcamStream;
-        videoElement.play().then(() => {
-          videoElement.requestPictureInPicture()
-          .catch(e => {
-            // Handle any errors that occur during requestPictureInPicture()
+        videoElement
+          .play()
+          .then(() => {
+            videoElement.requestPictureInPicture().catch((e) => {
+              // Handle any errors that occur during requestPictureInPicture()
+              console.error(e);
+            });
+          })
+          .catch((e) => {
+            // Handle errors that occur during play()
             console.error(e);
           });
-        }).catch(e => {
-          // Handle errors that occur during play()
-          console.error(e);
-        });
       })
-      .catch(error => {
-        console.error('Error accessing the webcam:', error);
+      .catch((error) => {
+        console.error("Error accessing the webcam:", error);
       });
 
     isRecording = true;
   }
 
-  function stopRecording() {
+  async function stopRecording() {
     screenRecorder.stop();
-    screenStream.getTracks().forEach(track => track.stop());
+    screenStream.getTracks().forEach((track) => track.stop());
     if (webcamStream) {
-      webcamStream.getTracks().forEach(track => track.stop());
+      webcamStream.getTracks().forEach((track) => track.stop());
     }
     isRecording = false;
 
- // Exit Picture-in-Picture mode if active
-  if (document.pictureInPictureElement) {
-    try {
-      await document.exitPictureInPicture();
-    } catch (error) {
-      console.error('Error exiting Picture-in-Picture:', error);
+    // Exit Picture-in-Picture mode if active
+    if (document.pictureInPictureElement) {
+      try {
+        await document.exitPictureInPicture();
+      } catch (error) {
+        console.error("Error exiting Picture-in-Picture:", error);
+      }
     }
-  }
-
   }
 
   function toggleRecording() {
@@ -98,7 +116,12 @@
   }
 </script>
 
-<Select id="microphones" class="mt-2" bind:value={selectedMicrophoneId} placeholder="">
+<Select
+  id="microphones"
+  class="mt-2"
+  bind:value={selectedMicrophoneId}
+  placeholder=""
+>
   {#each availableMicrophones as { value, name }}
     <option {value}>{name}</option>
   {/each}
@@ -117,7 +140,9 @@
   <div>
     <h2>Screen Recording</h2>
     <video src={screenVideoUrl} controls width="320"></video>
-    <a href={screenVideoUrl} download="screen-recording.webm">Download Screen Recording</a>
+    <a href={screenVideoUrl} download="screen-recording.webm"
+      >Download Screen Recording</a
+    >
   </div>
 {/if}
 
