@@ -1,47 +1,85 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg'
-  import Counter from './lib/Counter.svelte'
+  import { onMount } from 'svelte';
 
-  import { client } from './lib/trpc';
+  let screenStream, webcamStream;
+  let screenRecorder, webcamRecorder;
 
-  let name: string | undefined;
+  let screenVideoUrl, webcamVideoUrl;
 
-  async function testApi() {
-    let data = await client.userById.query("1")
-    name = data?.name
+  onMount(() => {
+    // Webcam stream with audio is set up in startRecording to ensure microphone access
+  });
+
+  async function startRecording() {
+    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+    webcamStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+    // Combine the screen stream with the audio from the webcamStream
+    const tracks = [...screenStream.getVideoTracks(), ...webcamStream.getAudioTracks()];
+    const combinedStream = new MediaStream(tracks);
+
+    screenRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
+    webcamRecorder = new MediaRecorder(webcamStream, { mimeType: 'video/webm' });
+
+    const screenChunks = [];
+    const webcamChunks = [];
+
+    screenRecorder.ondataavailable = e => screenChunks.push(e.data);
+    webcamRecorder.ondataavailable = e => webcamChunks.push(e.data);
+
+    screenRecorder.onstop = () => {
+      const blob = new Blob(screenChunks, { type: 'video/mp4' });
+      screenVideoUrl = URL.createObjectURL(blob);
+    };
+
+    webcamRecorder.onstop = () => {
+      const blob = new Blob(webcamChunks, { type: 'video/mp4' });
+      webcamVideoUrl = URL.createObjectURL(blob);
+    };
+
+    screenRecorder.start();
+    webcamRecorder.start();
   }
 
-  testApi()
+  function stopRecording() {
+    screenRecorder.stop();
+    webcamRecorder.stop();
+    // Stop all tracks from both streams
+    screenStream.getTracks().forEach(track => track.stop());
+    webcamStream.getTracks().forEach(track => track.stop());
+  }
 
 </script>
 
 <main>
-  
+
+<button on:click={startRecording}>Start Recording</button>
+<button on:click={stopRecording}>Stop Recording</button>
+
+{#if screenVideoUrl}
   <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer"> 
-      <img src="/vite.svg" class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer"> 
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
-    <a href="https://trpc.io/" target="_blank" rel="noreferrer"> 
-      <img src="/logo_trpc.svg" class="logo trpc" alt="tRPC Logo" />
-    </a>
+    <h2>Screen Recording</h2>
+    <video src={screenVideoUrl} controls width="320"></video>
+    <a href={screenVideoUrl} download="screen-recording.mp4">Download Screen Recording</a>
   </div>
-  {#if name}
-    <h1>Hello {name}!</h1>
-  {/if}
+{/if}
 
-  <div class="card">
-    <Counter />
+{#if webcamVideoUrl}
+  <div>
+    <h2>Webcam Recording</h2>
+    <video src={webcamVideoUrl} controls width="320"></video>
+    <a href={webcamVideoUrl} download="webcam-recording.mp4">Download Webcam Recording</a>
   </div>
+{/if}
 
-  <p class="read-the-docs">
-    Click on the Vite, Svelte and tRPC logos to learn more
-  </p>
 </main>
 
 <style>
+
+
+
+
+
   .logo {
     height: 6em;
     padding: 1.5em;
