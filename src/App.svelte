@@ -2,45 +2,38 @@
   import { onMount } from 'svelte';
 
   let isRecording = false;
-  let screenStream, webcamStream;
-  let screenRecorder, webcamRecorder;
-  let screenVideoUrl, webcamVideoUrl;
+  let screenStream;
+  let screenRecorder;
+  let screenVideoUrl;
 
   async function startRecording() {
-    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-    webcamStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    isRecording = true;
 
-    document.getElementById('screenPreview').srcObject = screenStream;
-    document.getElementById('webcamPreview').srcObject = webcamStream;
-
+    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
     screenRecorder = new MediaRecorder(screenStream, { mimeType: 'video/webm' });
-    webcamRecorder = new MediaRecorder(webcamStream, { mimeType: 'video/webm' });
 
     const screenChunks = [];
-    const webcamChunks = [];
-
     screenRecorder.ondataavailable = e => screenChunks.push(e.data);
-    webcamRecorder.ondataavailable = e => webcamChunks.push(e.data);
-
     screenRecorder.onstop = () => {
       const blob = new Blob(screenChunks, { type: 'video/mp4' });
       screenVideoUrl = URL.createObjectURL(blob);
     };
-
-    webcamRecorder.onstop = () => {
-      const blob = new Blob(webcamChunks, { type: 'video/mp4' });
-      webcamVideoUrl = URL.createObjectURL(blob);
-    };
-
     screenRecorder.start();
-    webcamRecorder.start();
+
+    const webcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const videoElement = document.getElementById('webcamPreview');
+    videoElement.srcObject = webcamStream;
+    videoElement.addEventListener('loadedmetadata', () => {
+      videoElement.play().then(() => {
+        videoElement.requestPictureInPicture();
+      });
+    });
   }
 
   function stopRecording() {
     screenRecorder.stop();
-    webcamRecorder.stop();
     screenStream.getTracks().forEach(track => track.stop());
-    webcamStream.getTracks().forEach(track => track.stop());
+    isRecording = false;
   }
 
   function toggleRecording() {
@@ -49,12 +42,10 @@
     } else {
       startRecording();
     }
-    isRecording = !isRecording;
   }
 </script>
 
-<main>
-
+<!-- App.svelte (Template) -->
 <button on:click={toggleRecording}>
   {#if isRecording}
     <span class="recording-indicator"></span>
@@ -65,12 +56,7 @@
 </button>
 
 {#if isRecording}
-  <div>
-    <h2>Live Screen Feed</h2>
-    <video id="screenPreview" width="320" autoplay muted></video>
-    <h2>Live Webcam Feed</h2>
-    <video id="webcamPreview" width="320" autoplay muted></video>
-  </div>
+  <video id="webcamPreview" width="320" autoplay muted></video>
 {/if}
 
 {#if screenVideoUrl}
@@ -80,15 +66,6 @@
     <a href={screenVideoUrl} download="screen-recording.mp4">Download Screen Recording</a>
   </div>
 {/if}
-
-{#if webcamVideoUrl}
-  <div>
-    <h2>Webcam Recording</h2>
-    <video src={webcamVideoUrl} controls width="320"></video>
-    <a href={webcamVideoUrl} download="webcam-recording.mp4">Download Webcam Recording</a>
-  </div>
-{/if}
-</main>
 
 <style>
   .recording-indicator {
