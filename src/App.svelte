@@ -24,7 +24,7 @@
       .map<MicrophoneInfo>((device) => ({
         inputDeviceInfo: device,
         value: device.deviceId,
-        name: device.label || "Microphone " + device.deviceId,
+        name: device.label || `Microphone ${device.deviceId}`,
       }));
 
     if (availableMicrophones.length > 0) {
