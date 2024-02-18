@@ -77,6 +77,16 @@
       webcamStream.getTracks().forEach(track => track.stop());
     }
     isRecording = false;
+
+ // Exit Picture-in-Picture mode if active
+  if (document.pictureInPictureElement) {
+    try {
+      await document.exitPictureInPicture();
+    } catch (error) {
+      console.error('Error exiting Picture-in-Picture:', error);
+    }
+  }
+
   }
 
   function toggleRecording() {
