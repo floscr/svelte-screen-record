@@ -29,7 +29,10 @@
     const audioConstraints = { audio: { deviceId: selectedMicrophoneId ? { exact: selectedMicrophoneId } : undefined } };
     const audioStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
     webcamStream = new MediaStream([...audioStream.getTracks()]);
-    const combinedStream = new MediaStream([...screenStream.getVideoTracks(), ...webcamStream.getAudioTracks()]);
+    const combinedStream = new MediaStream([...screenStream.getVideoTracks(), ...webcamStream.getAudioTracks()], {
+      mimeType: 'video/webm; codecs=vp9', // VP9 codec for better 
+      videoBitsPerSecond: 2 * 1024 * 1024 // 2 Mbps bitrate
+    });
 
     screenRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
 
