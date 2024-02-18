@@ -11,7 +11,7 @@
   });
 
   async function startRecording() {
-    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
     webcamStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
     // Combine the screen stream with the audio from the webcamStream
