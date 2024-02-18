@@ -52,16 +52,14 @@
     const audioStream =
       await navigator.mediaDevices.getUserMedia(audioConstraints);
     webcamStream = new MediaStream([...audioStream.getTracks()]);
-    const combinedStream = new MediaStream(
-      [...screenStream.getVideoTracks(), ...webcamStream.getAudioTracks()],
-      {
-        mimeType: "video/webm;codecs=vp9",
-        videoBitsPerSecond: 4 * 1024 * 1024,
-      },
-    );
+    const combinedStream = new MediaStream([
+      ...screenStream.getVideoTracks(),
+      ...webcamStream.getAudioTracks(),
+    ]);
 
     screenRecorder = new MediaRecorder(combinedStream, {
-      mimeType: "video/webm",
+      mimeType: "video/webm;codecs=vp9",
+      videoBitsPerSecond: 4 * 1024 * 1024,
     });
 
     const screenChunks: Blob[] = [];
