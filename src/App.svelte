@@ -50,8 +50,8 @@
     const combinedStream = new MediaStream(
       [...screenStream.getVideoTracks(), ...webcamStream.getAudioTracks()],
       {
-        mimeType: "video/webm; codecs=vp9", // VP9 codec for better
-        videoBitsPerSecond: 2 * 1024 * 1024, // 2 Mbps bitrate
+        mimeType: "video/webm;codecs=vp9",
+        videoBitsPerSecond: 4 * 1024 * 1024,
       },
     );
 
