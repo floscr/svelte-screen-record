@@ -1,22 +1,27 @@
 <script lang="ts">
   import { Select } from "flowbite-svelte";
-
   import { onMount } from "svelte";
 
+  interface MicrophoneInfo {
+    inputDeviceInfo: MediaDeviceInfo;
+    value: string;
+    name: string;
+  }
+
   let isRecording = false;
-  let availableMicrophones = [];
+  let availableMicrophones: MicrophoneInfo[] = [];
   let selectedMicrophoneId = "";
-  let screenStream;
-  let screenRecorder;
-  let webcamStream;
-  let screenVideoUrl;
-  let socket;
+  let screenStream: MediaStream;
+  let screenRecorder: MediaRecorder;
+  let webcamStream: MediaStream;
+  let screenVideoUrl: string;
+  let socket: WebSocket;
 
   onMount(async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
     availableMicrophones = devices
       .filter((device) => device.kind === "audioinput")
-      .map((device) => ({
+      .map<MicrophoneInfo>((device) => ({
         inputDeviceInfo: device,
         value: device.deviceId,
         name: device.label || "Microphone " + device.deviceId,
@@ -59,7 +64,7 @@
       mimeType: "video/webm",
     });
 
-    const screenChunks = [];
+    const screenChunks: Blob[] = [];
     screenRecorder.ondataavailable = (event) => {
       screenChunks.push(event.data);
       if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
