@@ -1,24 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
+  let isRecording = false;
   let screenStream, webcamStream;
   let screenRecorder, webcamRecorder;
-
   let screenVideoUrl, webcamVideoUrl;
 
-  onMount(() => {
-    // Webcam stream with audio is set up in startRecording to ensure microphone access
-  });
-
   async function startRecording() {
-    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
     webcamStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
-    // Combine the screen stream with the audio from the webcamStream
-    const tracks = [...screenStream.getVideoTracks(), ...webcamStream.getAudioTracks()];
-    const combinedStream = new MediaStream(tracks);
-
-    screenRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
+    screenRecorder = new MediaRecorder(screenStream, { mimeType: 'video/webm' });
     webcamRecorder = new MediaRecorder(webcamStream, { mimeType: 'video/webm' });
 
     const screenChunks = [];
@@ -44,17 +36,29 @@
   function stopRecording() {
     screenRecorder.stop();
     webcamRecorder.stop();
-    // Stop all tracks from both streams
     screenStream.getTracks().forEach(track => track.stop());
     webcamStream.getTracks().forEach(track => track.stop());
   }
 
+  function toggleRecording() {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+    isRecording = !isRecording;
+  }
 </script>
 
-<main>
-
-<button on:click={startRecording}>Start Recording</button>
-<button on:click={stopRecording}>Stop Recording</button>
+<!-- App.svelte (Template) -->
+<button on:click={toggleRecording}>
+  {#if isRecording}
+    <span class="recording-indicator"></span>
+    Stop Recording
+  {:else}
+    Start Recording
+  {/if}
+</button>
 
 {#if screenVideoUrl}
   <div>
@@ -72,26 +76,28 @@
   </div>
 {/if}
 
-</main>
-
 <style>
-
-
-
-
-
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
+  .recording-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: green;
+    animation: pulse 2s infinite;
   }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
+
+  @keyframes pulse {
+    0% {
+      transform: scale(0.95);
+      opacity: 1;
+    }
+    70% {
+      transform: scale(1.05);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(0.95);
+      opacity: 1;
+    }
   }
 </style>
