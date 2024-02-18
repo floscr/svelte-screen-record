@@ -39,6 +39,9 @@
         deviceId: selectedMicrophoneId
           ? { exact: selectedMicrophoneId }
           : undefined,
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
       },
     };
     const audioStream =
