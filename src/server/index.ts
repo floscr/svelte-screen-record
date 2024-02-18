@@ -3,6 +3,7 @@ import { fileURLToPath } from "url";
 
 import { WebSocketServer } from "ws";
 import fs from "fs";
+import { randomUUID } from "node:crypto";
 
 import express from "express";
 import * as trpcExpress from "@trpc/server/adapters/express";
@@ -14,8 +15,11 @@ import { appRouter, createContext } from "./trpc.js";
 const wss = new WebSocketServer({ port: 8080 });
 
 wss.on("connection", (ws) => {
-  console.log("Client connected");
-  const writeStream = fs.createWriteStream("output.webm");
+  const id = randomUUID();
+  const fileName = `${id}.mp4`;
+  const writeStream = fs.createWriteStream(fileName);
+
+  console.log(`Client connected, creating stream file`, fileName);
 
   ws.on("message", (message) => {
     console.log("Received chunk");
