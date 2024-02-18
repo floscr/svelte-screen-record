@@ -46,6 +46,7 @@
     "flowbite": "^2.3.0",
     "flowbite-svelte": "^0.44.23",
     "sirv": "^2.0.4",
-    "superjson": "^2.2.1"
+    "superjson": "^2.2.1",
+    "ws": "^8.16.0"
   }
 }

@@ -11,6 +11,8 @@
   let webcamStream;
   let screenVideoUrl;
 
+  const socket = new WebSocket("ws://localhost:8080");
+
   onMount(async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
     availableMicrophones = devices
@@ -54,12 +56,17 @@
     });
 
     const screenChunks = [];
-    screenRecorder.ondataavailable = (e) => screenChunks.push(e.data);
+    screenRecorder.ondataavailable = (event) => {
+      screenChunks.push(event.data);
+      if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
+        socket.send(event.data);
+      }
+    };
     screenRecorder.onstop = () => {
       const blob = new Blob(screenChunks, { type: "video/webm" });
       screenVideoUrl = URL.createObjectURL(blob);
     };
-    screenRecorder.start();
+    screenRecorder.start(1000);
 
     // Now add the webcam stream for PiP without recording it
     const webcamConstraints = { video: true };
