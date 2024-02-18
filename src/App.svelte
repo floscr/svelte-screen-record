@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { Select } from 'flowbite-svelte';
+
+
   import { onMount } from 'svelte';
 
   let isRecording = false;
@@ -9,13 +12,15 @@
   let webcamStream;
   let screenVideoUrl;
 
+
   onMount(async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    console.log(devices);
-    availableMicrophones = devices.filter(device => device.kind === 'audioinput');
-    console.log(availableMicrophones);
+    availableMicrophones = devices
+      .filter(device => device.kind === 'audioinput')
+      .map(device => ({ inputDeviceInfo: device, value: device.deviceId, name: device.label || 'Microphone ' + device.deviceId }))
+
     if (availableMicrophones.length > 0) {
-      selectedMicrophoneId = availableMicrophones[0].deviceId;
+      selectedMicrophoneId = availableMicrophones[0].value;
     }
   });
 
@@ -80,11 +85,11 @@
   }
 </script>
 
-<select bind:value={selectedMicrophoneId}>
-  {#each availableMicrophones as microphone}
-    <option value={microphone.deviceId}>{microphone.label || 'Microphone ' + microphone.deviceId}</option>
+<Select id="microphones" class="mt-2" bind:value={selectedMicrophoneId} placeholder="">
+  {#each availableMicrophones as { value, name }}
+    <option {value}>{name}</option>
   {/each}
-</select>
+</Select>
 
 <button on:click={toggleRecording}>
   {#if isRecording}
