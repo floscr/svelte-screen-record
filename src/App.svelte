@@ -151,6 +151,7 @@
 {#if screenVideoUrl}
   <div>
     <h2>Screen Recording</h2>
+    <!-- svelte-ignore a11y-media-has-caption -->
     <video src={screenVideoUrl} controls width="320"></video>
     <a href={screenVideoUrl} download="screen-recording.webm"
       >Download Screen Recording</a
