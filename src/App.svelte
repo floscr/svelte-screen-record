@@ -10,8 +10,7 @@
   let screenRecorder;
   let webcamStream;
   let screenVideoUrl;
-
-  const socket = new WebSocket("ws://localhost:8080");
+  let socket;
 
   onMount(async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -29,6 +28,8 @@
   });
 
   async function startRecording() {
+    socket = new WebSocket("ws://localhost:8080");
+
     screenStream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
       audio: false,
@@ -63,6 +64,7 @@
       }
     };
     screenRecorder.onstop = () => {
+      socket.close();
       const blob = new Blob(screenChunks, { type: "video/webm" });
       screenVideoUrl = URL.createObjectURL(blob);
     };
