@@ -10,6 +10,9 @@
     screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
     webcamStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
+    document.getElementById('screenPreview').srcObject = screenStream;
+    document.getElementById('webcamPreview').srcObject = webcamStream;
+
     screenRecorder = new MediaRecorder(screenStream, { mimeType: 'video/webm' });
     webcamRecorder = new MediaRecorder(webcamStream, { mimeType: 'video/webm' });
 
@@ -50,7 +53,8 @@
   }
 </script>
 
-<!-- App.svelte (Template) -->
+<main>
+
 <button on:click={toggleRecording}>
   {#if isRecording}
     <span class="recording-indicator"></span>
@@ -59,6 +63,15 @@
     Start Recording
   {/if}
 </button>
+
+{#if isRecording}
+  <div>
+    <h2>Live Screen Feed</h2>
+    <video id="screenPreview" width="320" autoplay muted></video>
+    <h2>Live Webcam Feed</h2>
+    <video id="webcamPreview" width="320" autoplay muted></video>
+  </div>
+{/if}
 
 {#if screenVideoUrl}
   <div>
@@ -75,6 +88,7 @@
     <a href={webcamVideoUrl} download="webcam-recording.mp4">Download Webcam Recording</a>
   </div>
 {/if}
+</main>
 
 <style>
   .recording-indicator {
