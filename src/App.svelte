@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { Select, Button } from "flowbite-svelte";
-
+    import { useMachine } from "@xstate/svelte";
+    import { Button, Select } from "flowbite-svelte";
     import { onMount } from "svelte";
+    import { assign, createMachine } from "xstate";
 
     interface MicrophoneInfo {
         inputDeviceInfo: MediaDeviceInfo;
