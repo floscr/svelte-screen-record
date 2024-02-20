@@ -14,12 +14,17 @@ interface MediaDevices {
     videoDevices: MediaDeviceInfo[];
 }
 
-export type States =
-    | { name: StateNames.Setup }
-    | { name: StateNames.Initial; devices: MediaDevices }
-    | { name: StateNames.Recording }
-    | { name: StateNames.Finished }
-    | { name: Error };
+type State<T> = { name: T };
+
+type SetupState = State<StateNames.Setup>;
+
+export type InitialState = State<StateNames.Initial> & {
+    devices: MediaDevices;
+};
+
+type ErrorState = State<StateNames.Error>;
+
+export type States = SetupState | InitialState | ErrorState;
 
 const enum Actors {
     LoadDevices = "LoadDevices",
@@ -45,6 +50,9 @@ const collectInputDevices = function (
 };
 
 export const stateMachine = setup({
+    types: {} as {
+        context: States;
+    },
     actors: {
         [Actors.LoadDevices]: fromPromise(async () => {
             const devices = await navigator.mediaDevices.enumerateDevices();

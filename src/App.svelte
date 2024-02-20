@@ -1,37 +1,29 @@
 <script lang="ts">
     import { createBrowserInspector } from "@statelyai/inspect";
     import { useMachine } from "@xstate/svelte";
-    import { Button, Select } from "flowbite-svelte";
 
+    import InitialStateComponent from "./components/InitialState.svelte";
     import { stateMachine, StateNames } from "./state";
+    import type { InitialState } from "./state.ts";
 
     const { inspect } = createBrowserInspector({
         // Comment out the line below to start the inspector
         // autoStart: false,
     });
 
+    $: initialContext = $snapshot.matches(StateNames.Initial)
+        ? ($snapshot.context as InitialState)
+        : undefined;
+
     const sm = useMachine(stateMachine, { inspect });
     const { snapshot } = sm;
-
-    console.log($snapshot);
-    console.log(sm);
 </script>
 
 <main>
     {#if $snapshot.matches(StateNames.Setup)}
-        Initial
-    {:else if $snapshot.matches(StateNames.Initial)}
-        <Select id="microphones" class="mt-2" placeholder="">
-            {#each $snapshot.context.devices.audioDevices as { label, deviceId }}
-                <option>{label || deviceId || "Default"}</option>
-            {/each}
-        </Select>
-        <Select id="microphones" class="mt-2" placeholder="">
-            {#each $snapshot.context.devices.videoDevices as { label, deviceId }}
-                <option>{label || deviceId || "Default"}</option>
-            {/each}
-        </Select>
-        Initial
+        Setup
+    {:else if $snapshot.matches(StateNames.Initial) && typeof initialContext !== "undefined"}
+        <InitialStateComponent context={initialContext} />
     {:else if $snapshot.matches(StateNames.Error)}
         Error
     {/if}
