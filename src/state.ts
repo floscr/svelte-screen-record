@@ -67,9 +67,12 @@ export const stateMachine = setup({
     },
     states: {
         [StateNames.Setup]: {
+            description: "Load input devices (webcam, microphone)",
             invoke: {
                 src: Actors.LoadDevices,
                 onDone: {
+                    description:
+                        "Devices were successfully loaded, display the initial UI",
                     target: StateNames.Initial,
                     actions: assign(({ event }) => {
                         const devices = collectInputDevices(event.output);
