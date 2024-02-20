@@ -11,9 +11,9 @@
         // autoStart: false,
     });
 
-    $: initialContext = $snapshot.matches(StateNames.Initial)
-        ? ($snapshot.context as InitialState)
-        : undefined;
+    $: initialContext =
+        $snapshot.matches(StateNames.Initial) &&
+        ($snapshot.context as InitialState);
 
     const sm = useMachine(stateMachine, { inspect });
     const { snapshot } = sm;
