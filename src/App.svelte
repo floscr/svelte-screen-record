@@ -14,8 +14,7 @@
         $snapshot.matches(StateNames.Initial) &&
         ($snapshot.context as InitialState);
 
-    const sm = useMachine(stateMachine, { inspect });
-    const { snapshot } = sm;
+    const { snapshot } = useMachine(stateMachine, { inspect });
 </script>
 
 <main>
