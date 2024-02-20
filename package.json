@@ -42,12 +42,14 @@
   "dependencies": {
     "@trpc/client": "^10.45.0",
     "@trpc/server": "^10.7.0",
+    "@xstate/svelte": "^3.0.2",
     "compression": "^1.7.4",
     "express": "^4.18.2",
     "flowbite": "^2.3.0",
     "flowbite-svelte": "^0.44.23",
     "sirv": "^2.0.4",
     "superjson": "^2.2.1",
-    "ws": "^8.16.0"
+    "ws": "^8.16.0",
+    "xstate": "^5.7.1"
   }
 }
