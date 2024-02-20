@@ -23,12 +23,12 @@
     {:else if $snapshot.matches(StateNames.Initial)}
         <Select id="microphones" class="mt-2" placeholder="">
             {#each $snapshot.context.devices.audioDevices as { label, deviceId }}
-                <option {deviceId}>{label || deviceId || "Default"}</option>
+                <option>{label || deviceId || "Default"}</option>
             {/each}
         </Select>
         <Select id="microphones" class="mt-2" placeholder="">
             {#each $snapshot.context.devices.videoDevices as { label, deviceId }}
-                <option {deviceId}>{label || deviceId || "Default"}</option>
+                <option>{label || deviceId || "Default"}</option>
             {/each}
         </Select>
         Initial

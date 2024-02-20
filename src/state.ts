@@ -9,9 +9,14 @@ export const enum StateNames {
     Error = "Error",
 }
 
+interface MediaDevices {
+    audioDevices: MediaDeviceInfo[];
+    videoDevices: MediaDeviceInfo[];
+}
+
 export type States =
     | { name: StateNames.Setup }
-    | { name: StateNames.Initial; devices: MediaDeviceInfo[] }
+    | { name: StateNames.Initial; devices: MediaDevices }
     | { name: StateNames.Recording }
     | { name: StateNames.Finished }
     | { name: Error };
@@ -20,9 +25,11 @@ const enum Actors {
     LoadDevices = "LoadDevices",
 }
 
-const collectInputDevices = function (devices: MediaDeviceInfo[]) {
-    const audioDevices = [];
-    const videoDevices = [];
+const collectInputDevices = function (
+    devices: MediaDeviceInfo[],
+): MediaDevices {
+    const audioDevices: MediaDeviceInfo[] = [];
+    const videoDevices: MediaDeviceInfo[] = [];
 
     devices.forEach(function (device) {
         match(device)
@@ -34,7 +41,7 @@ const collectInputDevices = function (devices: MediaDeviceInfo[]) {
     return {
         audioDevices,
         videoDevices,
-    };
+    } as MediaDevices;
 };
 
 export const stateMachine = setup({
@@ -59,12 +66,10 @@ export const stateMachine = setup({
                     actions: assign(({ event }) => {
                         const devices = collectInputDevices(event.output);
 
-                        console.log("devices", devices);
-
                         return {
                             name: StateNames.Initial,
                             devices,
-                        };
+                        } as States;
                     }),
                 },
                 onError: {
