@@ -1,4 +1,5 @@
-import { fromPromise, setup } from "xstate";
+import { match } from "ts-pattern";
+import { assign, fromPromise, setup } from "xstate";
 
 interface ScreenMedia {
     stream: MediaStream;
@@ -11,16 +12,17 @@ interface WebcamMedia {
 }
 
 export const enum StateNames {
+    Setup = "Setup",
     Initial = "Initial",
-    DeviceLoader = "DeviceLoader",
-    DevicesLoaded = "DevicesLoaded",
+    Error = "Error",
+
     Recording = "Recording",
     Finished = "Finished",
-    Error = "Error",
 }
 
 export type States =
-    | { name: StateNames.DeviceLoader }
+    | { name: StateNames.Setup }
+    | { name: StateNames.Initial; devices: MediaDeviceInfo[] }
     | {
           name: StateNames.DevicesLoaded;
           screenMedia: ScreenMedia;
@@ -41,8 +43,10 @@ export type States =
       };
 
 const enum Events {
-    Restart = "Restart",
     DevicesLoaded = "DevicesLoaded",
+
+    Preview = "Preview",
+    Restart = "Restart",
     StartRecording = "StartRecording",
     StopRecording = "StopRecording",
     ShowError = "ShowError",
@@ -52,35 +56,62 @@ const enum Actors {
     LoadDevices = "LoadDevices",
 }
 
+// interface InputDevice {
+//     selected?: string,
+//     devices: Set<string, MediaDeviceInfo>,
+// }
+
+// interface InputDevices {
+//     audio: InputDevice,
+//     video: InputDevice,
+// }
+
+const collectInputDevices = function (devices: MediaDeviceInfo[]) {
+    const audioDevices = [];
+    const videoDevices = [];
+
+    devices.forEach(function (device) {
+        match(device)
+            .with({ kind: "audioinput" }, (x) => audioDevices.push(x))
+            .with({ kind: "videoinput" }, (x) => videoDevices.push(x))
+            .otherwise(() => null);
+    });
+
+    return {
+        audioDevices,
+        videoDevices,
+    };
+};
+
 export const stateMachine = setup({
     actors: {
-        [Actors.LoadDevices]: fromPromise(() => {
-            const devices = navigator.mediaDevices.enumerateDevices();
+        [Actors.LoadDevices]: fromPromise(async () => {
+            const devices = await navigator.mediaDevices.enumerateDevices();
 
-            const webcamStream = navigator.mediaDevices.getUserMedia({
-                video: true,
-            });
-
-            const screenStream = navigator.mediaDevices.getDisplayMedia({
-                video: true,
-                audio: false,
-            });
-
-            return Promise.all([devices, webcamStream, screenStream]);
+            return devices;
         }),
     },
 }).createMachine({
-    initial: StateNames.Initial,
+    initial: StateNames.Setup,
     context: {
-        name: StateNames.DeviceLoader,
+        name: StateNames.Setup,
     },
     states: {
-        [StateNames.Initial]: {
+        [StateNames.Setup]: {
             invoke: {
                 src: Actors.LoadDevices,
                 onDone: {
-                    target: StateNames.DevicesLoaded,
-                    actions: console.log,
+                    target: StateNames.Initial,
+                    actions: assign(({ event }) => {
+                        const devices = collectInputDevices(event.output);
+
+                        console.log("devices", devices);
+
+                        return {
+                            name: StateNames.Initial,
+                            devices,
+                        };
+                    }),
                 },
                 onError: {
                     target: StateNames.Error,
@@ -88,7 +119,7 @@ export const stateMachine = setup({
                 },
             },
         },
-        [StateNames.DevicesLoaded]: {},
+        [StateNames.Initial]: {},
         [StateNames.Error]: {},
     },
 });

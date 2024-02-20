@@ -1,6 +1,7 @@
 <script lang="ts">
     import { createBrowserInspector } from "@statelyai/inspect";
     import { useMachine } from "@xstate/svelte";
+    import { Button, Select } from "flowbite-svelte";
 
     import { stateMachine, StateNames } from "./state";
 
@@ -9,11 +10,27 @@
         // autoStart: false,
     });
 
-    const { snapshot } = useMachine(stateMachine, { inspect });
+    const sm = useMachine(stateMachine, { inspect });
+    const { snapshot } = sm;
+
+    console.log($snapshot);
+    console.log(sm);
 </script>
 
 <main>
-    {#if $snapshot.matches(StateNames.Initial)}
+    {#if $snapshot.matches(StateNames.Setup)}
+        Initial
+    {:else if $snapshot.matches(StateNames.Initial)}
+        <Select id="microphones" class="mt-2" placeholder="">
+            {#each $snapshot.context.devices.audioDevices as { label, deviceId }}
+                <option {deviceId}>{label || deviceId || "Default"}</option>
+            {/each}
+        </Select>
+        <Select id="microphones" class="mt-2" placeholder="">
+            {#each $snapshot.context.devices.videoDevices as { label, deviceId }}
+                <option {deviceId}>{label || deviceId || "Default"}</option>
+            {/each}
+        </Select>
         Initial
     {:else if $snapshot.matches(StateNames.DevicesLoaded)}
         Devices Loaded
