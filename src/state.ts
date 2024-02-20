@@ -10,7 +10,7 @@ interface WebcamMedia {
     recorder?: MediaRecorder;
 }
 
-const enum StateNames {
+export const enum StateNames {
     Initial = "Initial",
     DeviceLoader = "DeviceLoader",
     DevicesLoaded = "DevicesLoaded",
@@ -19,7 +19,7 @@ const enum StateNames {
     Error = "Error",
 }
 
-type States =
+export type States =
     | { name: StateNames.DeviceLoader }
     | {
           name: StateNames.DevicesLoaded;
