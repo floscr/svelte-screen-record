@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Select } from "flowbite-svelte";
+  import { Select, Button } from "flowbite-svelte";
   import { onMount } from "svelte";
 
   interface MicrophoneInfo {
@@ -142,14 +142,14 @@
   {/each}
 </Select>
 
-<button on:click={toggleRecording}>
+<Button on:click={toggleRecording}>
   {#if isRecording}
     <span class="recording-indicator"></span>
     Stop Recording
   {:else}
     Start Recording
   {/if}
-</button>
+</Button>
 
 {#if screenVideoUrl}
   <div>
