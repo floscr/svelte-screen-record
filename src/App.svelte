@@ -32,8 +32,6 @@
             {/each}
         </Select>
         Initial
-    {:else if $snapshot.matches(StateNames.DevicesLoaded)}
-        Devices Loaded
     {:else if $snapshot.matches(StateNames.Error)}
         Error
     {/if}
