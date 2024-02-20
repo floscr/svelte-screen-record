@@ -2,7 +2,7 @@
     import { createBrowserInspector } from "@statelyai/inspect";
     import { useMachine } from "@xstate/svelte";
 
-    import InitialStateComponent from "./components/InitialState.svelte";
+    import InitialStateComponent from "./components/states/Initial.svelte";
     import { stateMachine, StateNames } from "./state";
     import type { InitialState } from "./state.ts";
 
