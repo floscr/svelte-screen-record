@@ -7,8 +7,7 @@
     import type { InitialState } from "./state.ts";
 
     const { inspect } = createBrowserInspector({
-        // Comment out the line below to start the inspector
-        // autoStart: false,
+        autoStart: import.meta.env.DEV,
     });
 
     $: initialContext =
