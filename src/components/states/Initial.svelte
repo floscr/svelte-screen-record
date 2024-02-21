@@ -9,7 +9,7 @@
 <main class="max-w-screen-sm space-y-6">
     <div class="laptop relative flex grow justify-center">
         <div class="preview">
-            <Button color="blue">Preview screen</Button>
+            <Button>Preview screen</Button>
         </div>
         <div class="keyboard"></div>
     </div>
@@ -32,7 +32,7 @@
                     >
                 {/each}
             </Select>
-            <Button>Start</Button>
+            <Button color="blue">Start</Button>
         </div>
     </div>
 </main>
@@ -50,7 +50,7 @@
         border: 1px solid var(--color-border);
     }
     .preview {
-        @apply relative flex  items-center justify-center p-3;
+        @apply relative flex  items-center justify-center bg-white bg-opacity-5 p-3;
         &:after {
             @apply absolute inset-3 rounded-sm bg-white bg-opacity-5 opacity-50;
             content: "";
@@ -59,7 +59,7 @@
         }
 
         &:before {
-            @apply absolute aspect-square rounded-full bg-white bg-opacity-5;
+            @apply absolute aspect-square rounded-full bg-black bg-opacity-10;
             content: "";
             width: 3%;
             top: 2.6%;
@@ -68,7 +68,7 @@
     }
 
     .keyboard {
-        @apply absolute;
+        @apply absolute bg-white bg-opacity-5;
         translate: 0% calc(100% + 10px);
         transform: rotateX(45deg) scaleY(0.7);
         transform-origin: top center;
