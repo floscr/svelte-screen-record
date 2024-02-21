@@ -48,7 +48,7 @@
         <div class="keyboard"></div>
     </div>
     <div
-        class="flex flex-col items-start space-y-3 rounded-lg border border-primary-700 bg-primary-50 bg-opacity-5 p-3 backdrop-blur-sm"
+        class="flex flex-col items-start space-y-3 rounded-lg border border-primary-700 bg-primary-50 bg-opacity-5 p-3 backdrop-blur-md"
         bind:this={uiWrapperElement}
     >
         <p class="text-sm opacity-70">Select recording devices</p>
