@@ -113,13 +113,13 @@ export const stateMachine = setup({
         ),
     },
     actions: {
-        [Actions.DevicesLoaded]: assign(({ event }) => {
+        [Actions.DevicesLoaded]: assign(({ event }): States => {
             const devices = collectInputDevices(event.output);
 
             return {
                 name: StateNames.Initial,
                 devices,
-            } as States;
+            };
         }),
     },
 }).createMachine({
@@ -136,23 +136,23 @@ export const stateMachine = setup({
                     description:
                         "Devices were successfully loaded, display the initial UI",
                     target: StateNames.Initial,
-                    actions: assign(({ event }) => {
+                    actions: assign(({ event }): States => {
                         const devices = collectInputDevices(event.output);
 
                         return {
                             name: StateNames.Initial,
                             devices,
-                        } as States;
+                        };
                     }),
                 },
                 onError: {
                     target: StateNames.Error,
-                    actions: assign(({ event }) => {
+                    actions: assign(({ event }): States => {
                         return {
                             name: StateNames.Error,
                             kind: ErrorKind.MissingPermissions,
                             error: event.error as Error,
-                        } as States;
+                        };
                     }),
                 },
             },
