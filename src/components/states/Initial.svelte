@@ -48,27 +48,33 @@
         <div class="keyboard"></div>
     </div>
     <div
-        class="flex flex-col items-start space-y-3 rounded-lg border border-primary-700 bg-primary-50 bg-opacity-5 p-3 backdrop-blur-md"
+        class="flex flex-col gap-3 divide-y divide-border rounded-lg border border-primary-700 bg-primary-50 bg-opacity-5 p-3 backdrop-blur-md"
         bind:this={uiWrapperElement}
     >
-        <p class="text-sm opacity-80">Select recording devices</p>
-        <div class="flex space-x-3">
-            <Select id="microphones" placeholder="Select a Microphone">
-                {#each context.devices.audioDevices as { label, deviceId }}
-                    <option value={deviceId}
-                        >{label || deviceId || "Default"}</option
-                    >
-                {/each}
-            </Select>
-            <Select id="cameras" placeholder="Select a Camera">
-                {#each context.devices.videoDevices as { label, deviceId }}
-                    <option value={deviceId}
-                        >{label || deviceId || "Default"}</option
-                    >
-                {/each}
-            </Select>
-            <Button color="blue">Start</Button>
+        <div class="flex flex-col items-start space-y-3">
+            <p class="text-sm opacity-80">Select recording devices</p>
+            <div class="flex space-x-3">
+                <Select id="microphones" placeholder="Select a Microphone">
+                    {#each context.devices.audioDevices as { label, deviceId }}
+                        <option value={deviceId}
+                            >{label || deviceId || "Default"}</option
+                        >
+                    {/each}
+                </Select>
+                <Select id="cameras" placeholder="Select a Camera">
+                    {#each context.devices.videoDevices as { label, deviceId }}
+                        <option value={deviceId}
+                            >{label || deviceId || "Default"}</option
+                        >
+                    {/each}
+                </Select>
+                <Button color="blue">Start</Button>
+            </div>
         </div>
+
+        <!-- <div class="pt-3">
+             <Checkbox checked>Picture in Picture</Checkbox>
+             </div> -->
     </div>
 </main>
 
