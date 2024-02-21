@@ -113,6 +113,11 @@
             top: 2.6%;
             border: 1px solid var(--color-border);
         }
+
+        &:after,
+        &:before {
+            pointer-events: none;
+        }
     }
 
     .keyboard {
