@@ -10,14 +10,13 @@
     const { inspect } = createBrowserInspector({
         autoStart: import.meta.env.DEV,
     });
+    $: errorContext = $snapshot.matches(StateNames.Error)
+        ? ($snapshot.context as ErrorState)
+        : undefined;
 
-    $: initialContext =
-        $snapshot.matches(StateNames.Initial) &&
-        ($snapshot.context as InitialState);
-
-    $: errorContext =
-        $snapshot.matches(StateNames.Error) &&
-        ($snapshot.context as ErrorState);
+    $: initialContext = $snapshot.matches(StateNames.Initial)
+        ? ($snapshot.context as InitialState)
+        : undefined;
 
     const { snapshot } = useMachine(stateMachine, { inspect });
 </script>
@@ -27,7 +26,7 @@
         <!-- Empty -->
     {:else if $snapshot.matches(StateNames.Initial) && typeof initialContext !== "undefined"}
         <InitialStateComponent context={initialContext} />
-    {:else if $snapshot.matches(StateNames.Error)}
+    {:else if $snapshot.matches(StateNames.Error) && typeof errorContext !== "undefined"}
         <ErrorStateComponent context={errorContext} />
     {/if}
 </main>

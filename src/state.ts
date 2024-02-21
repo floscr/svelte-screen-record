@@ -27,7 +27,7 @@ export type InitialState = State<StateNames.Initial> & {
     devices: MediaDevices;
 };
 
-type ErrorState = State<StateNames.Error> & {
+export type ErrorState = State<StateNames.Error> & {
     kind: ErrorKind;
     error: Error;
 };

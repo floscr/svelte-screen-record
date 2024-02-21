@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type { ErrorState } from "../../state.ts";
-    import { ErrorKind } from "../../state.ts";
+    import { ErrorKind } from "../../state";
+    import type { ErrorState } from "../../state";
 
     export let context: ErrorState;
 </script>
