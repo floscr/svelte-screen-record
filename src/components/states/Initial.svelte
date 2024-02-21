@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Select } from "flowbite-svelte";
 
-    import type { InitialState } from "../state.ts";
+    import type { InitialState } from "../../state.ts";
 
     export let context: InitialState;
 </script>

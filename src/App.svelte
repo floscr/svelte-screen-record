@@ -2,9 +2,10 @@
     import { createBrowserInspector } from "@statelyai/inspect";
     import { useMachine } from "@xstate/svelte";
 
+    import ErrorStateComponent from "./components/states/Error.svelte";
     import InitialStateComponent from "./components/states/Initial.svelte";
     import { stateMachine, StateNames } from "./state";
-    import type { InitialState } from "./state.ts";
+    import type { ErrorState, InitialState } from "./state.ts";
 
     const { inspect } = createBrowserInspector({
         autoStart: import.meta.env.DEV,
@@ -13,6 +14,10 @@
     $: initialContext =
         $snapshot.matches(StateNames.Initial) &&
         ($snapshot.context as InitialState);
+
+    $: errorContext =
+        $snapshot.matches(StateNames.Error) &&
+        ($snapshot.context as ErrorState);
 
     const { snapshot } = useMachine(stateMachine, { inspect });
 </script>
@@ -23,6 +28,6 @@
     {:else if $snapshot.matches(StateNames.Initial) && typeof initialContext !== "undefined"}
         <InitialStateComponent context={initialContext} />
     {:else if $snapshot.matches(StateNames.Error)}
-        Error
+        <ErrorStateComponent context={errorContext} />
     {/if}
 </main>

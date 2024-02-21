@@ -14,6 +14,11 @@ interface MediaDevices {
     videoDevices: MediaDeviceInfo[];
 }
 
+export enum ErrorKind {
+    MissingPermissions,
+    Unknown,
+}
+
 type State<T> = { name: T };
 
 type SetupState = State<StateNames.Setup>;
@@ -22,7 +27,10 @@ export type InitialState = State<StateNames.Initial> & {
     devices: MediaDevices;
 };
 
-type ErrorState = State<StateNames.Error>;
+type ErrorState = State<StateNames.Error> & {
+    kind: ErrorKind;
+    error: Error;
+};
 
 export type States = SetupState | InitialState | ErrorState;
 
@@ -57,6 +65,15 @@ export const stateMachine = setup({
         [Actors.LoadDevices]: fromPromise(async () => {
             const devices = await navigator.mediaDevices.enumerateDevices();
 
+            // Trigger permissions
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: true,
+            });
+            stream.getTracks().forEach((track) => {
+                track.stop();
+            });
+
             return devices;
         }),
     },
@@ -85,7 +102,13 @@ export const stateMachine = setup({
                 },
                 onError: {
                     target: StateNames.Error,
-                    actions: console.error,
+                    actions: assign(({ event }) => {
+                        return {
+                            name: StateNames.Error,
+                            kind: ErrorKind.MissingPermissions,
+                            error: event.error as Error,
+                        } as States;
+                    }),
                 },
             },
         },
