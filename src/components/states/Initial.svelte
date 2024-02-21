@@ -1,20 +1,55 @@
 <script lang="ts">
     import { Button, Select } from "flowbite-svelte";
+    import { onMount } from "svelte";
 
     import type { InitialState } from "../../state.ts";
+
+    let screenElement;
+    let laptopElement;
+    let uiWrapperElement;
+
+    onMount(() => {
+        const animationOptions = {
+            duration: 1000,
+            easing: "ease-out",
+        };
+
+        uiWrapperElement.animate(
+            [
+                { opacity: 0.3, translate: "0% 30px" },
+                { opacity: 1, translate: "0% 0%" },
+            ],
+            { ...animationOptions, duration: animationOptions.duration / 2 },
+        );
+        laptopElement.animate(
+            [
+                { opacity: 0.3, scale: 0.8 },
+                { opacity: 1, scale: 1 },
+            ],
+            animationOptions,
+        );
+        screenElement.animate(
+            [{ transform: "rotateX(-20deg)" }, { transform: "rotateX(0deg)" }],
+            animationOptions,
+        );
+    });
 
     export let context: InitialState;
 </script>
 
 <main class="max-w-screen-sm space-y-6">
-    <div class="laptop relative flex grow justify-center">
-        <div class="preview">
-            <Button>Preview screen</Button>
+    <div
+        class="laptop relative flex grow justify-center"
+        bind:this={laptopElement}
+    >
+        <div class="screen" bind:this={screenElement}>
+            <Button>Screen screen</Button>
         </div>
         <div class="keyboard"></div>
     </div>
     <div
         class="flex flex-col items-start space-y-3 rounded border border-primary-700 bg-primary-50 bg-opacity-5 p-3 backdrop-blur-sm"
+        bind:this={uiWrapperElement}
     >
         <p class="text-sm opacity-70">Select recording devices</p>
         <div class="flex space-x-3">
@@ -43,14 +78,15 @@
     }
 
     .keyboard,
-    .preview {
+    .screen {
         @apply aspect-video rounded;
         max-width: 500px;
         width: 70vw;
         border: 1px solid var(--color-border);
     }
-    .preview {
+    .screen {
         @apply relative flex  items-center justify-center bg-white bg-opacity-5 p-3;
+        transform-origin: bottom center;
         &:after {
             @apply absolute inset-3 rounded-sm bg-white bg-opacity-5 opacity-50;
             content: "";
