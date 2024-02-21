@@ -24,7 +24,7 @@
 
 <main>
     {#if $snapshot.matches(StateNames.Setup)}
-        Setup
+        <!-- Empty -->
     {:else if $snapshot.matches(StateNames.Initial) && typeof initialContext !== "undefined"}
         <InitialStateComponent context={initialContext} />
     {:else if $snapshot.matches(StateNames.Error)}
