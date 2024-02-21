@@ -34,8 +34,13 @@ type ErrorState = State<StateNames.Error> & {
 
 export type States = SetupState | InitialState | ErrorState;
 
+const enum Actions {
+    DevicesLoaded = "DevicesLoaded",
+}
+
 const enum Actors {
     LoadDevices = "LoadDevices",
+    PollForPermissions = "PollForPermissions",
 }
 
 const collectInputDevices = function (
@@ -57,6 +62,31 @@ const collectInputDevices = function (
     } as MediaDevices;
 };
 
+function pollForDevices(interval = 1000) {
+    return new Promise((resolve, reject) => {
+        const checkDevices = () => {
+            console.log("polling");
+            navigator.mediaDevices
+                .getUserMedia({
+                    audio: true,
+                    video: true,
+                })
+                .then((stream) => {
+                    stream.getTracks().forEach((track) => {
+                        track.stop();
+                    });
+                    return navigator.mediaDevices.enumerateDevices();
+                })
+                .then((devices) => resolve(devices))
+                .catch(() => {
+                    setTimeout(checkDevices, interval);
+                });
+        };
+
+        checkDevices();
+    });
+}
+
 export const stateMachine = setup({
     types: {} as {
         context: States;
@@ -75,6 +105,21 @@ export const stateMachine = setup({
             });
 
             return devices;
+        }),
+        [Actors.PollForPermissions]: fromPromise(async () => {
+            const devices = await pollForDevices();
+            console.log("Got devices", devices);
+            return devices;
+        }),
+    },
+    actions: {
+        [Actions.DevicesLoaded]: assign(({ event }) => {
+            const devices = collectInputDevices(event.output);
+
+            return {
+                name: StateNames.Initial,
+                devices,
+            } as States;
         }),
     },
 }).createMachine({
@@ -113,6 +158,14 @@ export const stateMachine = setup({
             },
         },
         [StateNames.Initial]: {},
-        [StateNames.Error]: {},
+        [StateNames.Error]: {
+            invoke: {
+                src: Actors.PollForPermissions,
+                onDone: {
+                    target: StateNames.Initial,
+                    actions: Actions.DevicesLoaded,
+                },
+            },
+        },
     },
 });
