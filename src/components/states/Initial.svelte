@@ -2,11 +2,11 @@
     import { Button, Select } from "flowbite-svelte";
     import { onMount } from "svelte";
 
-    import type { InitialState } from "../../state.ts";
+    import type { InitialState } from "../../state";
 
-    let screenElement;
-    let laptopElement;
-    let uiWrapperElement;
+    let screenElement: HTMLDivElement;
+    let laptopElement: HTMLDivElement;
+    let uiWrapperElement: HTMLDivElement;
 
     onMount(() => {
         const animationOptions = {
