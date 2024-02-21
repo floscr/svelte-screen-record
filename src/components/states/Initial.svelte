@@ -51,7 +51,7 @@
         class="flex flex-col items-start space-y-3 rounded-lg border border-primary-700 bg-primary-50 bg-opacity-5 p-3 backdrop-blur-md"
         bind:this={uiWrapperElement}
     >
-        <p class="text-sm opacity-70">Select recording devices</p>
+        <p class="text-sm opacity-80">Select recording devices</p>
         <div class="flex space-x-3">
             <Select id="microphones" placeholder="Select a Microphone">
                 {#each context.devices.audioDevices as { label, deviceId }}
