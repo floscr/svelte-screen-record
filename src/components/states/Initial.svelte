@@ -10,7 +10,7 @@
 
     onMount(() => {
         const animationOptions = {
-            duration: 1000,
+            duration: 750,
             easing: "ease-out",
         };
 
@@ -19,7 +19,7 @@
                 { opacity: 0.3, translate: "0% 30px" },
                 { opacity: 1, translate: "0% 0%" },
             ],
-            { ...animationOptions, duration: animationOptions.duration / 2 },
+            { ...animationOptions, duration: animationOptions.duration / 1.5 },
         );
         laptopElement.animate(
             [
