@@ -43,7 +43,7 @@
         bind:this={laptopElement}
     >
         <div class="screen" bind:this={screenElement}>
-            <Button>Screen screen</Button>
+            <Button>Preview Screen</Button>
         </div>
         <div class="keyboard"></div>
     </div>
