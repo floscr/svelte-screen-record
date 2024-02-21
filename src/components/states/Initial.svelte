@@ -16,7 +16,7 @@
 
         uiWrapperElement.animate(
             [
-                { opacity: 0.3, translate: "0% 30px" },
+                { opacity: 0.3, translate: "0% 10px" },
                 { opacity: 1, translate: "0% 0%" },
             ],
             { ...animationOptions, duration: animationOptions.duration / 1.5 },
