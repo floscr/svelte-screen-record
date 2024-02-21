@@ -17,6 +17,7 @@ const config = {
     theme: {
         extend: {
             colors: {
+                border: "var(--color-border)",
                 primary: {
                     bg: "#202736",
                     "50": "#f8fafc",
