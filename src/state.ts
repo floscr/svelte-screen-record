@@ -62,28 +62,35 @@ const collectInputDevices = function (
     } as MediaDevices;
 };
 
-function pollForDevices(interval = 1000) {
+function pollForDevices(
+    interval = 1000,
+    tries = Infinity,
+    tryCount = 0,
+): Promise<MediaDeviceInfo[]> {
     return new Promise((resolve, reject) => {
         const checkDevices = () => {
-            console.log("polling");
-            navigator.mediaDevices
-                .getUserMedia({
-                    audio: true,
-                    video: true,
-                })
-                .then((stream) => {
-                    stream.getTracks().forEach((track) => {
-                        track.stop();
+            if (tryCount < tries) {
+                return navigator.mediaDevices
+                    .getUserMedia({
+                        audio: true,
+                        video: true,
+                    })
+                    .then((stream) => {
+                        stream.getTracks().forEach((track) => {
+                            track.stop();
+                        });
+                        return navigator.mediaDevices.enumerateDevices();
+                    })
+                    .then((devices: MediaDeviceInfo[]) => resolve(devices))
+                    .catch(() => {
+                        setTimeout(checkDevices, interval, tries, tryCount++);
                     });
-                    return navigator.mediaDevices.enumerateDevices();
-                })
-                .then((devices) => resolve(devices))
-                .catch(() => {
-                    setTimeout(checkDevices, interval);
-                });
+            } else {
+                reject("Max tries reached");
+            }
         };
 
-        checkDevices();
+        return checkDevices();
     });
 }
 
