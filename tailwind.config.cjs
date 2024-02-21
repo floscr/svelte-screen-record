@@ -5,6 +5,7 @@ const config = {
     ],
 
     plugins: [
+        require("postcss-nesting"),
         require("flowbite/plugin"),
         require("@tailwind-plugin/expose-colors")({
             extract: ["primary"],
