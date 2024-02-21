@@ -34,9 +34,12 @@ export type ErrorState = State<StateNames.Error> & {
 
 export type States = SetupState | InitialState | ErrorState;
 
-const enum Actions {
+export const enum Actions {
+    ShowScreenPreview = "ShowScreenPreview",
     DevicesLoaded = "DevicesLoaded",
 }
+
+export type Events = { type: "ShowScreenPreview" };
 
 const enum Actors {
     LoadDevices = "LoadDevices",
@@ -97,6 +100,7 @@ function pollForDevices(
 export const stateMachine = setup({
     types: {} as {
         context: States;
+        events: Events;
     },
     actors: {
         [Actors.LoadDevices]: fromPromise(
@@ -113,14 +117,17 @@ export const stateMachine = setup({
         ),
     },
     actions: {
-        [Actions.DevicesLoaded]: assign(({ event }): States => {
-            const devices = collectInputDevices(event.output);
+        [Actions.DevicesLoaded]: assign((x: any): States => {
+            const devices = collectInputDevices(x.event.output);
 
             return {
                 name: StateNames.Initial,
                 devices,
             };
         }),
+        [Actions.ShowScreenPreview]: () => {
+            console.log("Show Preview");
+        },
     },
 }).createMachine({
     initial: StateNames.Setup,
@@ -157,7 +164,13 @@ export const stateMachine = setup({
                 },
             },
         },
-        [StateNames.Initial]: {},
+        [StateNames.Initial]: {
+            on: {
+                [Actions.ShowScreenPreview]: {
+                    actions: Actions.ShowScreenPreview,
+                },
+            },
+        },
         [StateNames.Error]: {
             invoke: {
                 src: Actors.PollForPermissions,

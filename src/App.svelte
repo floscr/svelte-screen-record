@@ -18,14 +18,19 @@
         ? ($snapshot.context as InitialState)
         : undefined;
 
-    const { snapshot } = useMachine(stateMachine, { inspect });
+    const { snapshot, send } = useMachine(stateMachine, { inspect });
 </script>
 
 <main>
     {#if $snapshot.matches(StateNames.Setup)}
         <!-- Empty -->
     {:else if $snapshot.matches(StateNames.Initial) && typeof initialContext !== "undefined"}
-        <InitialStateComponent context={initialContext} />
+        <InitialStateComponent
+            context={initialContext}
+            on:preview={() => {
+                send({ type: "ShowScreenPreview" });
+            }}
+        />
     {:else if $snapshot.matches(StateNames.Error) && typeof errorContext !== "undefined"}
         <ErrorStateComponent context={errorContext} />
     {/if}

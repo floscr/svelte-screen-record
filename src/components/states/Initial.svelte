@@ -1,12 +1,18 @@
 <script lang="ts">
     import { Button, Select } from "flowbite-svelte";
-    import { onMount } from "svelte";
+    import { createEventDispatcher, onMount } from "svelte";
 
     import type { InitialState } from "../../state";
+
+    const dispatch = createEventDispatcher();
 
     let screenElement: HTMLDivElement;
     let laptopElement: HTMLDivElement;
     let uiWrapperElement: HTMLDivElement;
+
+    function onPreviewClick() {
+        dispatch("preview");
+    }
 
     onMount(() => {
         const animationOptions = {
@@ -43,7 +49,7 @@
         bind:this={laptopElement}
     >
         <div class="screen" bind:this={screenElement}>
-            <Button>Preview Screen</Button>
+            <Button on:click={onPreviewClick}>Preview Screen</Button>
         </div>
         <div class="keyboard"></div>
     </div>
