@@ -99,25 +99,18 @@ export const stateMachine = setup({
         context: States;
     },
     actors: {
-        [Actors.LoadDevices]: fromPromise(async () => {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-
-            // Trigger permissions
-            const stream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-                video: true,
-            });
-            stream.getTracks().forEach((track) => {
-                track.stop();
-            });
-
-            return devices;
-        }),
-        [Actors.PollForPermissions]: fromPromise(async () => {
-            const devices = await pollForDevices();
-            console.log("Got devices", devices);
-            return devices;
-        }),
+        [Actors.LoadDevices]: fromPromise(
+            async (): Promise<MediaDeviceInfo[]> => {
+                const devices = await pollForDevices(0, 1);
+                return devices;
+            },
+        ),
+        [Actors.PollForPermissions]: fromPromise(
+            async (): Promise<MediaDeviceInfo[]> => {
+                const devices = await pollForDevices();
+                return devices;
+            },
+        ),
     },
     actions: {
         [Actions.DevicesLoaded]: assign(({ event }) => {
