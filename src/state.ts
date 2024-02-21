@@ -25,6 +25,7 @@ type SetupState = State<StateNames.Setup>;
 
 export type InitialState = State<StateNames.Initial> & {
     devices: MediaDevices;
+    screenStream?: MediaStream;
 };
 
 export type ErrorState = State<StateNames.Error> & {
