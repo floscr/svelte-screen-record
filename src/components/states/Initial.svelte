@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Button, Select } from "flowbite-svelte";
     import { createEventDispatcher, onMount } from "svelte";
+    import { match, P } from "ts-pattern";
 
     import type { InitialState } from "../../state";
 
@@ -9,6 +10,7 @@
     let screenElement: HTMLDivElement;
     let laptopElement: HTMLDivElement;
     let uiWrapperElement: HTMLDivElement;
+    let videoElement: HTMLVideoElement;
 
     let aspectRatioCSS: string = "16 / 9";
 
@@ -16,7 +18,7 @@
         dispatch("preview");
     }
 
-    onMount(() => {
+    const animateLaptop = function () {
         const animationOptions = {
             duration: 750,
             easing: "ease-out",
@@ -40,9 +42,28 @@
             [{ transform: "rotateX(-20deg)" }, { transform: "rotateX(0deg)" }],
             animationOptions,
         );
+    };
+
+    onMount(() => {
+        const screenWidth = window.screen.availWidth;
+        const screenHeight = window.screen.availHeight;
+        aspectRatioCSS = `${screenWidth} / ${screenHeight}`;
+        console.log(aspectRatioCSS);
+
+        animateLaptop();
     });
 
     export let context: InitialState;
+
+    $: context && videoElement && setSrcElement();
+
+    const setSrcElement = function () {
+        match(context.screenStream)
+            .with({ ok: true, val: P.select() }, (src: MediaStream) => {
+                videoElement.srcObject = src;
+            })
+            .otherwise(() => null);
+    };
 </script>
 
 <main class="max-w-screen-sm space-y-6">
@@ -55,6 +76,12 @@
             bind:this={screenElement}
             style="aspect-ratio: {aspectRatioCSS};"
         >
+            {#if context.screenStream}
+                <!-- svelte-ignore a11y-media-has-caption -->
+                <video bind:this={videoElement} autoplay />
+            {:else}
+                <Button on:click={onPreviewClick}>Preview Screen</Button>
+            {/if}
         </div>
         <div class="keyboard" style="aspect-ratio: {aspectRatioCSS};"></div>
     </div>
@@ -100,6 +127,7 @@
         max-width: 500px;
         width: 70vw;
         border: 1px solid var(--color-border);
+        overflow: hidden;
     }
     .screen {
         @apply relative flex  items-center justify-center bg-white bg-opacity-5 p-3;
@@ -122,6 +150,11 @@
         &:after,
         &:before {
             pointer-events: none;
+        }
+
+        video {
+            @apply rounded;
+            overflow: hidden;
         }
     }
 
