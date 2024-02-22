@@ -10,6 +10,8 @@
     let laptopElement: HTMLDivElement;
     let uiWrapperElement: HTMLDivElement;
 
+    let aspectRatioCSS: string = "16 / 9";
+
     function onPreviewClick() {
         dispatch("preview");
     }
@@ -48,10 +50,13 @@
         class="laptop relative flex grow justify-center"
         bind:this={laptopElement}
     >
-        <div class="screen" bind:this={screenElement}>
-            <Button on:click={onPreviewClick}>Preview Screen</Button>
+        <div
+            class="screen"
+            bind:this={screenElement}
+            style="aspect-ratio: {aspectRatioCSS};"
+        >
         </div>
-        <div class="keyboard"></div>
+        <div class="keyboard" style="aspect-ratio: {aspectRatioCSS};"></div>
     </div>
     <div
         class="flex flex-col gap-3 divide-y divide-border rounded-lg border border-primary-700 bg-primary-50 bg-opacity-5 p-3 backdrop-blur-md"
@@ -91,7 +96,7 @@
 
     .keyboard,
     .screen {
-        @apply aspect-video rounded;
+        @apply rounded;
         max-width: 500px;
         width: 70vw;
         border: 1px solid var(--color-border);
