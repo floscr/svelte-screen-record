@@ -1,9 +1,13 @@
 import { match } from "ts-pattern";
+import { Err, Ok, Result } from "ts-results";
 import { assign, fromPromise, setup } from "xstate";
 
 export const enum StateNames {
     Setup = "Setup",
     Initial = "Initial",
+    InitialIdle = "InitialIdle",
+    InitialRequestScreenPreview = "InitialRequestScreenPreview",
+    ScreenPreviewing = "ScreenPreviewing",
     Recording = "Recording",
     Finished = "Finished",
     Error = "Error",
@@ -25,7 +29,7 @@ type SetupState = State<StateNames.Setup>;
 
 export type InitialState = State<StateNames.Initial> & {
     devices: MediaDevices;
-    screenStream?: MediaStream;
+    screenStream?: Result<MediaStream, ErrorKind>;
 };
 
 export type ErrorState = State<StateNames.Error> & {
@@ -45,6 +49,7 @@ export type Events = { type: "ShowScreenPreview" };
 const enum Actors {
     LoadDevices = "LoadDevices",
     PollForPermissions = "PollForPermissions",
+    RecordScreen = "RecordScreen",
 }
 
 const collectInputDevices = function (
@@ -116,6 +121,13 @@ export const stateMachine = setup({
                 return devices;
             },
         ),
+        [Actors.RecordScreen]: fromPromise(async (): Promise<MediaStream> => {
+            const screenStream = navigator.mediaDevices.getDisplayMedia({
+                video: true,
+                audio: false,
+            });
+            return screenStream;
+        }),
     },
     actions: {
         [Actions.DevicesLoaded]: assign((x: any): States => {
@@ -126,9 +138,6 @@ export const stateMachine = setup({
                 devices,
             };
         }),
-        [Actions.ShowScreenPreview]: () => {
-            console.log("Show Preview");
-        },
     },
 }).createMachine({
     initial: StateNames.Setup,
@@ -166,10 +175,44 @@ export const stateMachine = setup({
             },
         },
         [StateNames.Initial]: {
-            on: {
-                [Actions.ShowScreenPreview]: {
-                    actions: Actions.ShowScreenPreview,
+            initial: StateNames.InitialIdle,
+            states: {
+                [StateNames.InitialIdle]: {
+                    on: {
+                        [Actions.ShowScreenPreview]:
+                            StateNames.InitialRequestScreenPreview,
+                    },
                 },
+                [StateNames.InitialRequestScreenPreview]: {
+                    invoke: {
+                        src: Actors.RecordScreen,
+                        onDone: {
+                            target: StateNames.ScreenPreviewing,
+                            actions: assign(({ event }: { event: any }) => {
+                                console.log(event.output);
+                                return {
+                                    name: StateNames.Initial,
+                                    screenStream: Ok(
+                                        event.output as MediaStream,
+                                    ),
+                                };
+                            }),
+                        },
+                        onError: {
+                            target: StateNames.InitialIdle,
+                            actions: assign(
+                                ({ event }: { event: any }): States => {
+                                    return {
+                                        screenStream: Err(
+                                            event.output as Error,
+                                        ),
+                                    };
+                                },
+                            ),
+                        },
+                    },
+                },
+                [StateNames.ScreenPreviewing]: {},
             },
         },
         [StateNames.Error]: {
