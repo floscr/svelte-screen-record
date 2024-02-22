@@ -153,7 +153,7 @@
         }
 
         video {
-            @apply rounded;
+            @apply h-full rounded;
             overflow: hidden;
         }
     }
