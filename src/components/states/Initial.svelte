@@ -71,17 +71,19 @@
         class="laptop relative flex grow justify-center"
         bind:this={laptopElement}
     >
-        <div
-            class="screen"
-            bind:this={screenElement}
-            style="aspect-ratio: {aspectRatioCSS};"
-        >
-            {#if context.screenStream}
-                <!-- svelte-ignore a11y-media-has-caption -->
-                <video bind:this={videoElement} autoplay />
-            {:else}
-                <Button on:click={onPreviewClick}>Preview Screen</Button>
-            {/if}
+        <div class="display" bind:this={screenElement}>
+            <div class="webcam" />
+            <div class="screen" style="aspect-ratio: {aspectRatioCSS};">
+                {#if context.screenStream}
+                    <!-- svelte-ignore a11y-media-has-caption -->
+                    <video bind:this={videoElement} autoplay />
+                {:else}
+                    <div class="flex w-full items-center justify-center">
+                        <Button on:click={onPreviewClick}>Preview Screen</Button
+                        >
+                    </div>
+                {/if}
+            </div>
         </div>
         <div class="keyboard" style="aspect-ratio: {aspectRatioCSS};"></div>
     </div>
@@ -122,45 +124,44 @@
     }
 
     .keyboard,
-    .screen {
+    .display {
         @apply rounded;
         max-width: 500px;
         width: 70vw;
         border: 1px solid var(--color-border);
         overflow: hidden;
     }
-    .screen {
-        @apply relative flex  items-center justify-center bg-white bg-opacity-5 p-3;
+    .display {
+        @apply relative flex flex-col items-center bg-white bg-opacity-5 p-3 pt-2;
         transform-origin: bottom center;
-        &:after {
-            @apply absolute inset-3 rounded-sm bg-white bg-opacity-5 opacity-50;
-            content: "";
-            top: 10%;
-            border: 1px solid var(--color-border);
-        }
+    }
 
-        &:before {
-            @apply absolute aspect-square rounded-full bg-black bg-opacity-10;
-            content: "";
-            width: 3%;
-            top: 2.6%;
-            border: 1px solid var(--color-border);
-        }
-
-        &:after,
-        &:before {
-            pointer-events: none;
-        }
+    .screen {
+        @apply flex w-full grow rounded-sm;
+        border: 1px solid var(--color-border);
+        position: relative;
+        overflow: hidden;
+        background-color: rgba(0, 0, 0, 0.1);
 
         video {
             @apply h-full rounded;
+            position: absolute;
+            left: 50%;
+            translate: -50% 0%;
+            width: auto;
             overflow: hidden;
         }
     }
 
+    .webcam {
+        @apply mb-2 aspect-square rounded-full bg-black bg-opacity-10;
+        width: 3%;
+        border: 1px solid var(--color-border);
+    }
+
     .keyboard {
         @apply absolute bg-white bg-opacity-5;
-        translate: 0% calc(100% + 10px);
+        translate: 0% calc(100% + 40px);
         transform: rotateX(45deg) scaleY(0.7);
         transform-origin: top center;
         z-index: -1;
