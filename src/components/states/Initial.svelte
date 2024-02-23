@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { IconChevronCompactDown } from "@tabler/icons-svelte";
     import { Button, Select } from "flowbite-svelte";
     import { createEventDispatcher, onMount } from "svelte";
     import { match, P } from "ts-pattern";
@@ -81,7 +82,7 @@
 
 <main class="max-w-screen-sm space-y-6">
     <div class="intro">
-        <h1 class="mb-2 text-2xl">Record your screen</h1>
+        <h1 class="mb-2 text-center text-2xl">Record your screen</h1>
         <p class="text-sm text-primary-400">
             Record your screen (or window) together with a webcam window &
             easily save the outcome as a video file to share with others.
@@ -108,7 +109,7 @@
         <div class="keyboard" style="aspect-ratio: {aspectRatioCSS};"></div>
     </div>
     <div
-        class="flex flex-col gap-3 divide-y divide-border rounded-lg border border-primary-700 bg-primary-50 bg-opacity-5 p-3 backdrop-blur-md"
+        class="flex flex-col gap-3 rounded-lg border border-primary-700 bg-primary-50 bg-opacity-5 p-3 backdrop-blur-md"
         bind:this={uiWrapperElement}
     >
         <div class="flex flex-col items-start space-y-3">
@@ -138,6 +139,11 @@
                     {/each}
                 </Select>
                 <Button color="blue">Start</Button>
+            </div>
+            <div class="more-settings">
+                <div class="more-settings-button">
+                    <IconChevronCompactDown />
+                </div>
             </div>
         </div>
 
@@ -207,5 +213,17 @@
             from(rgba(0, 0, 0, 1)),
             to(rgba(0, 0, 0, 0))
         );
+    }
+
+    .more-settings {
+        @apply flex w-full items-center justify-center;
+        height: 5px;
+    }
+    .more-settings-button {
+        @apply cursor-pointer;
+        opacity: 0.3;
+        &:hover {
+            opacity: 1;
+        }
     }
 </style>
