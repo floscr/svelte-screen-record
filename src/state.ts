@@ -1,6 +1,12 @@
 import { match } from "ts-pattern";
 import { Err, Ok, Result } from "ts-results";
-import { assign, fromPromise, setup } from "xstate";
+import {
+    assign,
+    fromCallback,
+    fromEventObservable,
+    fromPromise,
+    setup,
+} from "xstate";
 
 export const enum StateNames {
     Setup = "Setup",
@@ -44,12 +50,13 @@ export const enum Actions {
     DevicesLoaded = "DevicesLoaded",
 }
 
-export type Events = { type: "ShowScreenPreview" };
+export type Events = { type: "ShowScreenPreview" } | StoppedScreenPreview;
 
 const enum Actors {
     LoadDevices = "LoadDevices",
     PollForPermissions = "PollForPermissions",
     RecordScreen = "RecordScreen",
+    ListenForScreenRecordStop = "ListenForScreenRecordStop",
 }
 
 const collectInputDevices = function (
@@ -128,9 +135,26 @@ export const stateMachine = setup({
             });
             return screenStream;
         }),
+        [Actors.ListenForScreenRecordStop]: fromCallback(
+            ({ input, send }: { input: MediaStream }) => {
+                input.getVideoTracks()[0].onended = () => {
+                    sendBack("stop");
+                };
+
+                return () => {};
+            },
+        ),
     },
     actions: {
         [Actions.DevicesLoaded]: assign((x: any): States => {
+            const devices = collectInputDevices(x.event.output);
+
+            return {
+                name: StateNames.Initial,
+                devices,
+            };
+        }),
+        [Actions.Stopped]: assign((x: any): States => {
             const devices = collectInputDevices(x.event.output);
 
             return {
@@ -189,7 +213,6 @@ export const stateMachine = setup({
                         onDone: {
                             target: StateNames.ScreenPreviewing,
                             actions: assign(({ event }: { event: any }) => {
-                                console.log(event.output);
                                 return {
                                     name: StateNames.Initial,
                                     screenStream: Ok(
@@ -212,7 +235,19 @@ export const stateMachine = setup({
                         },
                     },
                 },
-                [StateNames.ScreenPreviewing]: {},
+                [StateNames.ScreenPreviewing]: {
+                    invoke: {
+                        src: Actors.ListenForScreenRecordStop,
+                        input: ({ context }) => {
+                            return context.screenStream.val;
+                        },
+                    },
+                    on: {
+                        stop: assign(() => ({
+                            screenStream: undefined,
+                        })),
+                    },
+                },
             },
         },
         [StateNames.Error]: {
