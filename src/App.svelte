@@ -30,6 +30,12 @@
             on:preview={() => {
                 send({ type: "ShowScreenPreview" });
             }}
+            on:changeSelectedAudioInputId={(e) => {
+                send({ type: "ChangeSelectedAudioInputId", id: e.detail });
+            }}
+            on:changeSelectedVideoInputId={(e) => {
+                send({ type: "ChangeSelectedVideoInputId", id: e.detail });
+            }}
         />
     {:else if $snapshot.matches(StateNames.Error) && typeof errorContext !== "undefined"}
         <ErrorStateComponent context={errorContext} />

@@ -18,6 +18,19 @@
         dispatch("preview");
     }
 
+    function dispatchDeviceSelectedIdChange(eventKey: string, event: Event) {
+        const target = event.target as HTMLSelectElement;
+        dispatch(eventKey, target.value);
+    }
+
+    function onChangeSelectedAudioInputId(event: Event) {
+        dispatchDeviceSelectedIdChange("changeSelectedAudioInputId", event);
+    }
+
+    function onChangeSelectedVideoInputId(event: Event) {
+        dispatchDeviceSelectedIdChange("changeSelectedVideoInputId", event);
+    }
+
     const animateLaptop = function () {
         const animationOptions = {
             duration: 750,
@@ -94,14 +107,24 @@
         <div class="flex flex-col items-start space-y-3">
             <p class="text-sm opacity-80">Select recording devices</p>
             <div class="flex space-x-3">
-                <Select id="microphones" placeholder="Select a Microphone">
+                <Select
+                    id="microphones"
+                    placeholder="Select a Microphone"
+                    bind:value={context.devices.selectedAudioDeviceId}
+                    on:change={onChangeSelectedAudioInputId}
+                >
                     {#each context.devices.audioDevices as { label, deviceId }}
                         <option value={deviceId}
                             >{label || deviceId || "Default"}</option
                         >
                     {/each}
                 </Select>
-                <Select id="cameras" placeholder="Select a Camera">
+                <Select
+                    id="cameras"
+                    placeholder="Select a Camera"
+                    bind:value={context.devices.selectedVideoDeviceId}
+                    on:change={onChangeSelectedVideoInputId}
+                >
                     {#each context.devices.videoDevices as { label, deviceId }}
                         <option value={deviceId}
                             >{label || deviceId || "Default"}</option

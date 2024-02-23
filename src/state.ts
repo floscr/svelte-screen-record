@@ -22,6 +22,8 @@ export const enum StateNames {
 interface MediaDevices {
     audioDevices: MediaDeviceInfo[];
     videoDevices: MediaDeviceInfo[];
+    selectedAudioDeviceId?: string;
+    selectedVideoDeviceId?: string;
 }
 
 export enum ErrorKind {
@@ -53,6 +55,8 @@ export const enum Actions {
 
 export type Events =
     | { type: "ShowScreenPreview" }
+    | { type: "ChangeSelectedAudioInputId"; id: string }
+    | { type: "ChangeSelectedVideoInputId"; id: string }
     | { type: "StopScreenRecord" };
 
 const enum Actors {
@@ -78,7 +82,9 @@ const collectInputDevices = function (
     return {
         audioDevices,
         videoDevices,
-    } as MediaDevices;
+        selectedAudioDeviceId: audioDevices[0].deviceId || undefined,
+        selectedVideoDeviceId: videoDevices[0].deviceId || undefined,
+    };
 };
 
 function pollForDevices(
@@ -196,6 +202,28 @@ export const stateMachine = setup({
         },
         [StateNames.Initial]: {
             initial: StateNames.InitialIdle,
+            on: {
+                ChangeSelectedAudioInputId: {
+                    actions: assign(({ context }) => {
+                        return {
+                            devices: {
+                                ...context.devices,
+                                selectedAudioDeviceId: event.id,
+                            },
+                        };
+                    }),
+                },
+                ChangeSelectedVideoInputId: {
+                    actions: assign(({ context }) => {
+                        return {
+                            devices: {
+                                ...context.devices,
+                                selectedVideoDeviceId: event.id,
+                            },
+                        };
+                    }),
+                },
+            },
             states: {
                 [StateNames.InitialIdle]: {
                     on: {
