@@ -136,9 +136,9 @@ export const stateMachine = setup({
             return screenStream;
         }),
         [Actors.ListenForScreenRecordStop]: fromCallback(
-            ({ input, send }: { input: MediaStream }) => {
+            ({ input, sendBack }: { input: MediaStream }) => {
                 input.getVideoTracks()[0].onended = () => {
-                    sendBack("stop");
+                    sendBack({ type: "stop" });
                 };
 
                 return () => {};
@@ -243,9 +243,12 @@ export const stateMachine = setup({
                         },
                     },
                     on: {
-                        stop: assign(() => ({
-                            screenStream: undefined,
-                        })),
+                        stop: {
+                            target: StateNames.InitialIdle,
+                            actions: assign(() => ({
+                                screenStream: undefined,
+                            })),
+                        },
                     },
                 },
             },
