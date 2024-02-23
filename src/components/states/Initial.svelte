@@ -80,6 +80,13 @@
 </script>
 
 <main class="max-w-screen-sm space-y-6">
+    <div class="intro">
+        <h1 class="mb-2 text-2xl">Record your screen</h1>
+        <p class="text-sm text-primary-400">
+            Record your screen (or window) together with a webcam window &
+            easily save the outcome as a video file to share with others.
+        </p>
+    </div>
     <div
         class="laptop relative flex grow justify-center"
         bind:this={laptopElement}
@@ -142,6 +149,11 @@
 </main>
 
 <style lang="postcss">
+    .intro {
+        @apply mx-auto mb-6 flex flex-col;
+        max-width: 420px;
+    }
+
     .laptop {
         perspective: 500px;
     }
