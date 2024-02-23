@@ -3,9 +3,9 @@ import { Err, Ok, Result } from "ts-results";
 import {
     assign,
     fromCallback,
-    fromEventObservable,
     fromPromise,
     setup,
+    type EventObject,
 } from "xstate";
 
 export const enum StateNames {
@@ -26,6 +26,7 @@ interface MediaDevices {
 
 export enum ErrorKind {
     MissingPermissions,
+    ScreenRecordError,
     Unknown,
 }
 
@@ -50,7 +51,9 @@ export const enum Actions {
     DevicesLoaded = "DevicesLoaded",
 }
 
-export type Events = { type: "ShowScreenPreview" } | StoppedScreenPreview;
+export type Events =
+    | { type: "ShowScreenPreview" }
+    | { type: "StopScreenRecord" };
 
 const enum Actors {
     LoadDevices = "LoadDevices",
@@ -135,26 +138,19 @@ export const stateMachine = setup({
             });
             return screenStream;
         }),
-        [Actors.ListenForScreenRecordStop]: fromCallback(
-            ({ input, sendBack }: { input: MediaStream }) => {
-                input.getVideoTracks()[0].onended = () => {
-                    sendBack({ type: "stop" });
-                };
+        [Actors.ListenForScreenRecordStop]: fromCallback<
+            EventObject,
+            MediaStream
+        >(({ input, sendBack }) => {
+            input.getVideoTracks()[0].onended = () => {
+                sendBack({ type: "StopScreenRecord" });
+            };
 
-                return () => {};
-            },
-        ),
+            return () => {};
+        }),
     },
     actions: {
         [Actions.DevicesLoaded]: assign((x: any): States => {
-            const devices = collectInputDevices(x.event.output);
-
-            return {
-                name: StateNames.Initial,
-                devices,
-            };
-        }),
-        [Actions.Stopped]: assign((x: any): States => {
             const devices = collectInputDevices(x.event.output);
 
             return {
@@ -223,27 +219,27 @@ export const stateMachine = setup({
                         },
                         onError: {
                             target: StateNames.InitialIdle,
-                            actions: assign(
-                                ({ event }: { event: any }): States => {
-                                    return {
-                                        screenStream: Err(
-                                            event.output as Error,
-                                        ),
-                                    };
-                                },
-                            ),
+                            actions: assign(({ event }: { event: any }) => {
+                                console.log(event);
+                                return {
+                                    screenStream: Err(
+                                        ErrorKind.ScreenRecordError,
+                                    ),
+                                };
+                            }),
                         },
                     },
                 },
                 [StateNames.ScreenPreviewing]: {
                     invoke: {
                         src: Actors.ListenForScreenRecordStop,
-                        input: ({ context }) => {
-                            return context.screenStream.val;
+                        // TODO: Not really sure how to type this
+                        input: ({ context }: { context: any }) => {
+                            return context.screenStream?.val;
                         },
                     },
                     on: {
-                        stop: {
+                        StopScreenRecord: {
                             target: StateNames.InitialIdle,
                             actions: assign(() => ({
                                 screenStream: undefined,
