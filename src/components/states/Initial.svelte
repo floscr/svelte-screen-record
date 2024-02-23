@@ -112,7 +112,6 @@
         bind:this={uiWrapperElement}
     >
         <div class="flex flex-col items-start space-y-3">
-            <p class="text-sm opacity-80">Select recording devices</p>
             <div class="flex space-x-3">
                 <Select
                     id="microphones"
