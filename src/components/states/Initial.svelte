@@ -1,6 +1,6 @@
 <script lang="ts">
     import { IconChevronCompactDown } from "@tabler/icons-svelte";
-    import { Button, Select } from "flowbite-svelte";
+    import { Button, Select, Toggle } from "flowbite-svelte";
     import { createEventDispatcher, onMount } from "svelte";
     import { match, P } from "ts-pattern";
 
@@ -70,6 +70,7 @@
     export let context: InitialState;
 
     $: context && videoElement && setSrcElement();
+    $: isPreviewingStream = !!context.screenStream;
 
     const setSrcElement = function () {
         match(context.screenStream)
@@ -94,6 +95,19 @@
         bind:this={laptopElement}
     >
         <div class="display" bind:this={screenElement}>
+            <div class="toggle">
+                <label class="mb-5 inline-flex cursor-pointer items-center">
+                    <input
+                        type="checkbox"
+                        class="peer sr-only"
+                        bind:checked={isPreviewingStream}
+                        on:click={(e) => e.preventDefault()}
+                    />
+                    <div
+                        class="peer relative mt-1.5 h-3 w-7 rounded-full border border-border after:absolute after:top-[1px] after:h-2 after:w-3 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full"
+                    ></div>
+                </label>
+            </div>
             <div class="webcam" />
             <div class="screen" style="aspect-ratio: {aspectRatioCSS};">
                 {#if context.screenStream}
@@ -246,5 +260,9 @@
                 color: white;
             }
         }
+    }
+
+    .toggle {
+        @apply absolute right-0 right-3 top-0.5;
     }
 </style>
