@@ -248,7 +248,6 @@ export const stateMachine = setup({
                         onError: {
                             target: StateNames.InitialIdle,
                             actions: assign(({ event }: { event: any }) => {
-                                console.log(event);
                                 return {
                                     screenStream: Err(
                                         ErrorKind.ScreenRecordError,
