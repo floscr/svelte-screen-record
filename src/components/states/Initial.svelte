@@ -83,7 +83,7 @@
 <main class="max-w-screen-sm space-y-6">
     <div class="intro text-center">
         <h1 class="mb-2 text-2xl">Record your screen</h1>
-        <p class="text-sm text-primary-400">
+        <p class="text-sm text-primary-300 opacity-80">
             Record your screen (or window) together with a webcam window &
             easily save the outcome as a video file to share with others.
         </p>
