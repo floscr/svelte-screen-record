@@ -98,16 +98,20 @@
         bind:this={laptopElement}
     >
         <div class="display" bind:this={screenElement}>
-            <div class="toggle" data-tooltip-target="tooltip-light">
+            <div class="toggle">
                 <Tooltip
                     class="z-10 min-w-[300px] dark:bg-black"
                     triggeredBy="[data-tooltip-target^='tooltip-light']"
+                    offset={10}
                     ><p>
                         {isPreviewingStream ? "Turn off" : "Turn on"} screen preview.
                         <br />Turning this off will not stop your recording.
                     </p></Tooltip
                 >
-                <label class="mb-5 inline-flex cursor-pointer items-center">
+                <label
+                    class="inline-flex cursor-pointer items-center"
+                    data-tooltip-target="tooltip-light"
+                >
                     <input
                         type="checkbox"
                         class="peer sr-only"
