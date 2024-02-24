@@ -88,7 +88,7 @@
             Record your screen (or window) together with a webcam window and
             easily save the outcome as a video file to share with others.
         </p>
-        <a href="#" class="mt-2 text-sm">Learn More</a>
+        <a href="/" class="mt-2 text-sm">Learn More</a>
     </div>
     <div
         class="laptop relative flex grow justify-center"
