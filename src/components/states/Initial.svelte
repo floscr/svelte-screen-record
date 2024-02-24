@@ -151,6 +151,11 @@
              <Checkbox checked>Picture in Picture</Checkbox>
              </div> -->
     </div>
+    <footer>
+        A product by <a target="_blank" href="https://florianschroedl.com"
+            >Florian Schrödl</a
+        >
+    </footer>
 </main>
 
 <style lang="postcss">
@@ -224,6 +229,21 @@
         opacity: 0.3;
         &:hover {
             opacity: 1;
+        }
+    }
+
+    footer {
+        @apply fixed bottom-5 text-sm;
+        left: 50%;
+        translate: -50% 0;
+        color: #7b91a9ad;
+
+        & a {
+            @apply font-bold transition-colors;
+            color: #91a2b4d1;
+            &:hover {
+                color: white;
+            }
         }
     }
 </style>
