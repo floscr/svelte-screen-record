@@ -1,5 +1,8 @@
 <script lang="ts">
-    import { IconChevronCompactDown } from "@tabler/icons-svelte";
+    import {
+        IconBrandGithub,
+        IconChevronCompactDown,
+    } from "@tabler/icons-svelte";
     import { Button, Select, Tooltip } from "flowbite-svelte";
     import { createEventDispatcher, onMount } from "svelte";
     import { match, P } from "ts-pattern";
@@ -174,10 +177,17 @@
              <Checkbox checked>Picture in Picture</Checkbox>
              </div> -->
     </div>
-    <footer>
-        A product by <a target="_blank" href="https://florianschroedl.com"
-            >Florian Schrödl</a
-        >
+    <footer class="flex place-items-center gap-5">
+        <p>
+            A tool by <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://florianschroedl.com">Florian Schrödl</a
+            >
+        </p>
+        <a href="https://github.com/floscr/svelte-screen-record">
+            <IconBrandGithub />
+        </a>
     </footer>
 </main>
 
