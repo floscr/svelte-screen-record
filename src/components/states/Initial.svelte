@@ -23,6 +23,7 @@
     }
 
     function dispatchDeviceSelectedIdChange(eventKey: string, event: Event) {
+        event.preventDefault();
         const target = event.target as HTMLSelectElement;
         dispatch(eventKey, target.value);
     }
