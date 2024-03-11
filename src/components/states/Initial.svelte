@@ -147,7 +147,6 @@
                 <Select
                     id="microphones"
                     placeholder="Select a Microphone"
-                    bind:value={context.devices.selectedAudioDeviceId}
                     on:change={onChangeSelectedAudioInputId}
                 >
                     {#each context.devices.audioDevices as { label, deviceId }}
@@ -159,7 +158,6 @@
                 <Select
                     id="cameras"
                     placeholder="Select a Camera"
-                    bind:value={context.devices.selectedVideoDeviceId}
                     on:change={onChangeSelectedVideoInputId}
                 >
                     {#each context.devices.videoDevices as { label, deviceId }}
