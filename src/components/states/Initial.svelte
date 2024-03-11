@@ -189,7 +189,7 @@
             >
         </p>
         <a href="https://github.com/floscr/svelte-screen-record">
-            <IconBrandGithub />
+            <IconBrandGithub size="19" class="mt-[-2px]" />
         </a>
     </footer>
 </main>
@@ -285,5 +285,16 @@
 
     .toggle {
         @apply absolute right-0 right-3 top-0.5;
+    }
+
+    .peer {
+        top: 1px;
+    }
+    .peer:after {
+        margin-left: 2px;
+        margin-top: 1px;
+    }
+    input:checked ~ .peer {
+        box-shadow: 0 0 10px 0 green;
     }
 </style>
