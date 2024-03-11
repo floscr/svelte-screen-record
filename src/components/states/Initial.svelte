@@ -120,7 +120,7 @@
                         on:click={(e) => e.preventDefault()}
                     />
                     <div
-                        class="peer relative mt-1.5 h-3 w-7 rounded-full border border-border after:absolute after:top-[1px] after:h-2 after:w-3 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full"
+                        class="peer relative mt-1.5 h-3 w-7 rounded-full border border-border after:absolute after:h-2 after:w-3 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-green-500 peer-checked:after:translate-x-full"
                     ></div>
                 </label>
             </div>
